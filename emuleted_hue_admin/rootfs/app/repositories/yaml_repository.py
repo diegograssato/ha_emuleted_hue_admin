@@ -52,7 +52,8 @@ class YamlConfigRepository:
         return data or {}, err
 
     def _save_full_yaml(self, full_data: dict) -> Optional[str]:
-        return YamlUtils.safe_dump(self._config_path, full_data)
+        hue_dict = full_data.get(EMULATED_HUE_KEY, {})
+        return YamlUtils.update_yaml_section(self._config_path, EMULATED_HUE_KEY, hue_dict)
 
     def _get_hue_section(self, full_data: dict) -> dict:
         section = full_data.get(EMULATED_HUE_KEY)

@@ -83,6 +83,76 @@ class YamlUtils:
             return str(exc)
 
     @staticmethod
+    def update_yaml_section(
+        path: Path,
+        section_key: str,
+        section_data: dict,
+    ) -> Optional[str]:
+        """Update only *section_key* in a YAML file, leaving all other content
+        (including comments, blank lines, and unrelated keys) intact.
+
+        On the first call the existing bare key block is located by column-0
+        detection and replaced; on subsequent calls the ``# --- BEGIN/END ---``
+        markers are used for fast in-place replacement.
+        """
+        begin_marker = f"# --- BEGIN {section_key} ---"
+        end_marker = f"# --- END {section_key} ---"
+
+        section_yaml = yaml.dump(
+            {section_key: section_data},
+            default_flow_style=False,
+            allow_unicode=True,
+            sort_keys=False,
+        )
+        new_block = f"{begin_marker}\n{section_yaml}{end_marker}\n"
+
+        try:
+            text = path.read_text(encoding="utf-8") if path.exists() else ""
+        except OSError as exc:
+            return str(exc)
+
+        if begin_marker in text and end_marker in text:
+            # Fast path: replace between existing markers (inclusive)
+            b_start = text.index(begin_marker)
+            e_end = text.index(end_marker) + len(end_marker)
+            if e_end < len(text) and text[e_end] == "\n":
+                e_end += 1
+            new_text = text[:b_start] + new_block + text[e_end:]
+        else:
+            # Locate the key at column 0 and replace its indented block
+            lines = text.splitlines(keepends=True)
+            sec_start = None
+            for i, line in enumerate(lines):
+                stripped = line.rstrip("\n\r")
+                if stripped == f"{section_key}:" or stripped.startswith(f"{section_key}:"):
+                    if stripped and not stripped[0].isspace():
+                        sec_start = i
+                        break
+            if sec_start is not None:
+                sec_end = len(lines)
+                for i in range(sec_start + 1, len(lines)):
+                    ln = lines[i].rstrip("\n\r")
+                    if ln and not ln[0].isspace():
+                        sec_end = i
+                        break
+                before = "".join(lines[:sec_start])
+                after = "".join(lines[sec_end:])
+                new_text = before + new_block + after
+            else:
+                # Key not present: append
+                new_text = (text.rstrip("\n") + "\n" if text else "") + new_block
+
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            tmp_path = path.with_suffix(".tmp")
+            tmp_path.write_text(new_text, encoding="utf-8")
+            shutil.move(str(tmp_path), str(path))
+            return None
+        except OSError as exc:
+            logger.error("OS error writing section %s in %s: %s", section_key, path, exc)
+            return str(exc)
+
+    @staticmethod
     def validate_yaml_string(content: str) -> Tuple[Optional[Any], Optional[str]]:
         """Validate a YAML string. Returns (parsed_data, error)."""
         try:

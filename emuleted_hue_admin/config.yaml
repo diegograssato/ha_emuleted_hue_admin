@@ -1,6 +1,6 @@
 ---
 name: "Emulated Hue Manager"
-version: "1.0.2"
+version: "1.0.3"
 slug: "emulated_hue_manager"
 description: "Visual manager for Home Assistant Emulated Hue configuration"
 url: "https://github.com/grassato/ha_emuleted_hue_admin"
