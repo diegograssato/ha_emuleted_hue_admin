@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emulated Hue Manager</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <div class="app-wrapper">
+    <header class="app-header">
+      <h1>&#128161; Emulated Hue Manager</h1>
+      <p>Interface de gerenciamento do Emulated Hue para controle de entidades e configuração.</p>
+    </header>
+    <nav class="tab-nav" id="tab-nav">
+      <button class="tab-btn active" data-tab="dashboard">&#128202; Dashboard</button>
+      <button class="tab-btn" data-tab="config">&#9881; Configuração</button>
+      <button class="tab-btn" data-tab="entities">&#128279; Entidades</button>
+      <button class="tab-btn" data-tab="yaml">&#128196; Raw YAML</button>
+      <button class="tab-btn" data-tab="backup">&#128190; Backup / Restore</button>
+      <button class="tab-btn" data-tab="diagnostics">&#128300; Diagnóstico</button>
+      <button class="tab-btn" data-tab="audit">&#128203; Auditoria</button>
+    </nav>
+    <div id="tab-dashboard"   class="tab-panel active"></div>
+    <div id="tab-config"      class="tab-panel"></div>
+    <div id="tab-entities"    class="tab-panel"></div>
+    <div id="tab-yaml"        class="tab-panel"></div>
+    <div id="tab-backup"      class="tab-panel"></div>
+    <div id="tab-diagnostics" class="tab-panel"></div>
+    <div id="tab-audit"       class="tab-panel"></div>
+  </div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+  <div id="loading-overlay" class="loading-overlay hidden"><div class="spinner"></div></div>
+
+  <!-- Entity modal -->
+  <div id="entity-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" id="entity-modal-backdrop"></div>
+    <div class="modal-box">
+      <h2 id="entity-modal-title" class="modal-title">Entidade</h2>
+      <form id="entity-form" autocomplete="off">
+        <div class="form-group" style="margin-bottom:12px">
+          <label for="ef-entity-id">Entity ID *</label>
+          <input type="text" id="ef-entity-id" name="entity_id"
+                 placeholder="light.minha_luz"
+                 list="ha-states-datalist"
+                 autocomplete="off"
+                 required />
+          <datalist id="ha-states-datalist"></datalist>
+          <div id="ef-entity-id-hint" style="font-size:11px;color:var(--text-muted);margin-top:4px;display:none">
+            &#128268; Carregando estados do Home Assistant…
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label for="ef-name">Nome</label>
+          <input type="text" id="ef-name" name="name" placeholder="Minha Luz" />
+        </div>
+        <label class="checkbox-row" style="margin-bottom:12px">
+          <input type="checkbox" id="ef-hidden" name="hidden" />
+          Oculta (Hidden)
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="entity-modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm modal -->
+  <div id="confirm-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" id="confirm-modal-backdrop"></div>
+    <div class="modal-box">
+      <h2 class="modal-title">Confirmar</h2>
+      <p id="confirm-modal-message" style="color:var(--text);margin-bottom:0"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="confirm-cancel">Cancelar</button>
+        <button type="button" class="btn btn-danger"  id="confirm-ok">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

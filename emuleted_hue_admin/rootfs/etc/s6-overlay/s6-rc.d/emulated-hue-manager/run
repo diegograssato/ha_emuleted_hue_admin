@@ -1,0 +1,13 @@
+#!/command/with-contenv bashio
+# ==============================================================================
+# Start the Emulated Hue Manager (uvicorn)
+# ==============================================================================
+bashio::log.info "Starting Emulated Hue Manager..."
+
+export PYTHONPATH=/
+
+exec uvicorn app.main:app \
+    --host 0.0.0.0 \
+    --port 8099 \
+    --workers 1 \
+    --log-level info

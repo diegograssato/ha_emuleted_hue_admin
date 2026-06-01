@@ -1,0 +1,32 @@
+---
+name: "Emulated Hue Manager"
+version: "1.0.0"
+slug: "emulated_hue_manager"
+description: "Visual manager for Home Assistant Emulated Hue configuration"
+url: "https://github.com/grassato/ha_emuleted_hue_admin"
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+startup: services
+boot: auto
+map:
+  - homeassistant_config:rw
+ports:
+  8099/tcp: 8099
+ports_description:
+  8099/tcp: "Web UI"
+ingress: true
+ingress_port: 8099
+panel_icon: mdi:lightbulb-multiple-outline
+panel_title: "Emulated Hue"
+homeassistant_api: true
+hassio_api: true
+hassio_role: manager
+auth_api: true
+environment:
+  HA_CONFIG_PATH: "/homeassistant/configuration.yaml"
+options: {}
+schema: {}

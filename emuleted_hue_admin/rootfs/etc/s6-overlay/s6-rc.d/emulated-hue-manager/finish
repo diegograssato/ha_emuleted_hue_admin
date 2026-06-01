@@ -1,0 +1,5 @@
+#!/command/with-contenv bashio
+# ==============================================================================
+# Called when uvicorn exits
+# ==============================================================================
+bashio::log.warning "Emulated Hue Manager exited with code ${1}"
